@@ -7,26 +7,40 @@ import (
 	"strings"
 )
 
-
-func main(){
-
+func main() {
 	reader := bufio.NewReader(os.Stdin)
 
+	for {
+		fmt.Println("Choose an option:")
+		fmt.Println("1. Word Frequency Count")
+		fmt.Println("2. Palindrome Check")
+		fmt.Println("3. Exit")
 
-	fmt.Println("Enter the statment to be counted")
-	statment,_ := reader.ReadString('\n')
+		fmt.Print("Enter your choice (1-3): ")
+		choice, _ := reader.ReadString('\n')
+		choice = strings.TrimSpace(choice)
 
-	fmt.Println("Enter the statment to chceck weather palindrome or not")
-	statment2,_ := reader.ReadString('\n')
-	statment3 := strings.ToLower(statment2)
-	
-	resultForCount :=count(statment)
-	fmt.Println(resultForCount)
-
-	checkpalindrome := palindrome(statment3)
-	fmt.Printf("the statment is %s \n",  checkpalindrome+".")
-
-
-
-
+		switch choice {
+		case "1":
+			fmt.Print("Enter a statement: ")
+			input, _ := reader.ReadString('\n')
+			input = strings.TrimSpace(input)
+			wordCount := Frequency(input)
+			fmt.Println("Word Frequency:", wordCount)
+		case "2":
+			fmt.Print("Enter a word or phrase: ")
+			input, _ := reader.ReadString('\n')
+			input = strings.TrimSpace(input)
+			if Palindrome(input) {
+				fmt.Println("palindrome.")
+			} else {
+				fmt.Println("Not a palindrome.")
+			}
+		case "3":
+			fmt.Println("Exiting")
+			return
+		default:
+			fmt.Println("Please try again.")
+		}
+	}
 }
