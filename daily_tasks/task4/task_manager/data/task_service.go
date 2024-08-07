@@ -1,106 +1,86 @@
 package data
 
 import (
-	"net/http"
-
 	"example.com/task_manager/models"
+	"errors"
+	"fmt"
 
-	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
-// var tasks = map[string]models.Task{
-var tasks = []models.Task{
-	{
-		ID:          "1",
-		Title:       "Implement User Login",
-		Description: "Create user login functionality using JWT.",
-		Status:      "In Progress",
+var Data = map[string]models.Task{
+	"1": {
+		ID:       "1",
+		Name:     "Task 1",
+		Detail:   "Detail for Task 1",
 	},
-	{
-		ID:          "2",
-		Title:       "Design Home Page",
-		Description: "Design the UI for the home page with responsive elements.",
-		Status:      "To Do",
+	"2": {
+		ID:       "2",
+		Name:     "Task 2",
+		Detail:   "Detail for Task 2",
 	},
-	{
-		ID:          "3",
-		Title:       "Database Migration",
-		Description: "Migrate database schema to the latest version.",
-		Status:      "Completed",
+	"3": {
+		ID:       "3",
+		Name:     "Task 3",
+		Detail:   "Detail for Task 3",
+	},
+	"4": {
+		ID:       "4",
+		Name:     "Task 4",
+		Detail:   "Detail for Task 4",
 	},
 }
 
-func GetAllTasks(c *gin.Context) {
+func AddTask(task models.Task) (models.Task, error) {
 
-	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
+	validator := validator.New()
+	err := validator.Struct(task)
+	if err != nil {
+		return models.Task{}, errors.New("a task must have an id")
+	}
+	_, exists := Data[task.ID]
+	if !exists {
+		Data[task.ID] = task
+		return task, nil
+	}
 
+	fmt.Println("no Data")
+	return models.Task{}, errors.New("a task with this id exists")
 }
+func GetAllTask() map[string]models.Task {
+	return Data
+}
+func GetTask(id string) (models.Task, error) {
+	val, exists := Data[id]
+	if !exists {
+		fmt.Println("no Data")
+		return models.Task{}, errors.New("no task with this ID")
+	}
+	return val, nil
+}
+func DeleteTask(id string) (models.Task, error) {
+	if val, ok := Data[id]; ok {
+		delete(Data, id)
+		return val, nil
+	}
+	return models.Task{}, errors.New("NO such Task ID")
+}
+func UpdateTask(task models.Task, id string) (models.Task, error) {
 
-func GetById(c *gin.Context) {
-
-	id := c.Param("id")
-
-	for _, task := range tasks {
-		if task.ID == id {
-			c.JSON(http.StatusOK, task)
-			return
-
+	if val, ok := Data[id]; ok {
+		if task.Detail != "" {
+			val.Detail = task.Detail
 		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "page not found"})
-}
-
-func UpdateTask(c *gin.Context) {
-	id := c.Param("id")
-	var updatedTask models.Task
-
-	if err := c.ShouldBindJSON(&updatedTask); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-
-	}
-	for _, task := range tasks {
-		if task.ID == id {
-			if task.Title != "" {
-				task.Title = updatedTask.Title
-			}
-			if task.Description != "" {
-				task.Description = updatedTask.Description
-			}
-			c.JSON(http.StatusAccepted, gin.H{"message": "Task updated successfully"})
-			return
-
+	
+		if task.ID != "" {
+			val.ID = task.ID
 		}
-
-	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Task not found"})
-
-}
-
-func DeleteTask(c *gin.Context) {
-	id := c.Param("id")
-
-	for i, task := range tasks {
-
-		if task.ID == id {
-			tasks = append(tasks[:i], tasks[i+1])
-			c.JSON(http.StatusOK, gin.H{"message": "Task removed successfully"})
-			return
+		if task.Name != "" {
+			val.Name = task.Name
 		}
-		c.JSON(http.StatusNotFound, gin.H{"message": "Task not found"})
-		return
+		
+		Data[id] = val
+		return Data[id], nil
 	}
-
-}
-
-func CreateTask(c *gin.Context) {
-	var newTask models.Task
-
-	if err := c.ShouldBindJSON(&newTask); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "can not bind JSON"})
-		return
-	}
-	tasks = append(tasks, newTask)
-	c.JSON(http.StatusCreated, gin.H{"message": "Task added successfully"})
-
+	return models.Task{}, errors.New("NO Data Such ID")
 }
