@@ -1,0 +1,1 @@
+This task management project allows users to register with a unique username and password. If the username is already taken or the fields are empty, you’ll get an error message. Successful registration returns a confirmation and user details. For more details, check out this Api Documentation [ https://documenter.getpostman.com/view/37356354/2sA3s1nBj1 ]
