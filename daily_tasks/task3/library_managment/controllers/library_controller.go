@@ -1,22 +1,24 @@
 package controllers
 
 import (
-    "bufio"
-    "fmt"
-    "library_managment/models"
-    "library_managment/services"
-    "os"
-    "strconv"
-    "strings"
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+
+	"library_managment/models"
+	"library_managment/services"
 )
 var library = services.NewLibrary() 
 
 func prompt() string {
+    reader := bufio.NewReader(os.Stdin)
    for {
-        reader := bufio.NewReader(os.Stdin)
         input, err := reader.ReadString('\n')
         if err != nil {
-            fmt.Println("Error reading input. Please try again.")
+            log.Println("Error reading input. Please try again.")
             continue
         }
         input = strings.TrimSpace(input)
